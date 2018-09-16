@@ -34,3 +34,9 @@ For more information about the individual loggers, make sure to read `?IOLogger`
 ## Known Issues
 
  * The `maxlog` keyword is theoretically supported, but doesn't work at the moment. See [this](https://github.com/JuliaLang/julia/issues/28786) issue in Base.
+
+## Known ToDo
+
+ * Add custom log message formatting
+ * Add more tests
+ * Make decision on logging error catching (IOLogging.jl#20)
