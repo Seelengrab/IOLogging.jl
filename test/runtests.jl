@@ -1,7 +1,8 @@
 module IOLoggingTests
 
 using IOLogging
-using Logging: Logging, Debug, Info, Warn, Error, BelowMinLevel, with_logger, min_enabled_level
+using Logging
+using Logging: Debug, Info, Warn, Error, BelowMinLevel, with_logger, min_enabled_level
 using Test
 
 function singleLineLogging()
