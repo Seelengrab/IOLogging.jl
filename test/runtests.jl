@@ -51,18 +51,18 @@ end
         @testset "Multiline No Debug" begin
             with_logger(multiLineLogging, log)
             res = String(take!(buf))
-            @test !occursin(r"(DEBUG)|(Debug)", res) &
+            @test (!occursin(r"(DEBUG)|(Debug)", res) &
                     !occursin(r"debug_line_1\n", res) &
-                    !occursin(r"debug_line_2\n", res)
-            @test occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
+                    !occursin(r"debug_line_2\n", res))
+            @test (occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
                     occursin(r"info_line_1\n", res) &
-                    occursin(r"info_line_2\n", res)
-            @test occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
+                    occursin(r"info_line_2\n", res))
+            @test (occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
                     occursin(r"warn_line_1\n", res) &
-                    occursin(r"warn_line_2\n", res)
-            @test occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
+                    occursin(r"warn_line_2\n", res))
+            @test (occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
                     occursin(r"error_line_1\n", res) &
-                    occursin(r"error_line_2\n", res)
+                    occursin(r"error_line_2\n", res))
         end
         @testset "Keyword Logging No Debug" begin
             with_logger(keywordLogging, log)
@@ -80,16 +80,16 @@ end
             with_logger(singleLineLogging, logger)
 
             infres = String(take!(infLog)) # should only contain messages from INFO and WARN
-            @test   !occursin(r"DEBUG", infres) &
+            @test  (!occursin(r"DEBUG", infres) &
                      occursin(r"INFO", infres) &
                      occursin(r"WARN", infres) &
-                    !occursin(r"ERROR", infres)
+                    !occursin(r"ERROR", infres))
 
             errres = String(take!(errLog)) # should only contain messages from ERROR
-            @test   !occursin(r"DEBUG", errres) &
+            @test  (!occursin(r"DEBUG", errres) &
                     !occursin(r"INFO", errres) &
                     !occursin(r"WARN", errres) &
-                     occursin(r"ERROR", errres)
+                     occursin(r"ERROR", errres))
         end
         @testset "Message Limits" begin
             with_logger(log) do
@@ -131,18 +131,18 @@ end
                     with_logger(multiLineLogging, log)
                     res = string(readlines(defaultLog, keep = true)...)
 
-                    @test !occursin(r"(DEBUG)|(Debug)", res) &
-                            !occursin(r"debug_line_1\n", res) &
-                            !occursin(r"debug_line_2\n", res)
-                    @test occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                            occursin(r"info_line_1\n", res) &
-                            occursin(r"info_line_2\n", res)
-                    @test occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                            occursin(r"warn_line_1\n", res) &
-                            occursin(r"warn_line_2\n", res)
-                    @test occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                            occursin(r"error_line_1\n", res) &
-                            occursin(r"error_line_2\n", res)
+                    @test (!occursin(r"(DEBUG)|(Debug)", res) &
+                           !occursin(r"debug_line_1\n", res) &
+                           !occursin(r"debug_line_2\n", res))
+                    @test (occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
+                           occursin(r"info_line_1\n", res) &
+                           occursin(r"info_line_2\n", res))
+                    @test (occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
+                           occursin(r"warn_line_1\n", res) &
+                           occursin(r"warn_line_2\n", res))
+                    @test (occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
+                           occursin(r"error_line_1\n", res) &
+                           occursin(r"error_line_2\n", res))
                 end
                 @testset "Keyword Logging No Debug" begin
                     with_logger(keywordLogging, log)
@@ -161,15 +161,15 @@ end
                     infres = string(readlines(infLog, keep = true)...)
                     errres = string(readlines(errLog, keep = true)...)
 
-                    @test   !occursin(r"DEBUG", infres) &
+                    @test  (!occursin(r"DEBUG", infres) &
                             occursin(r"INFO", infres) &
                             occursin(r"WARN", infres) &
-                            !occursin(r"ERROR", infres)
+                            !occursin(r"ERROR", infres))
 
-                    @test   !occursin(r"DEBUG", errres) &
+                    @test  (!occursin(r"DEBUG", errres) &
                             !occursin(r"INFO", errres) &
                             !occursin(r"WARN", errres) &
-                            occursin(r"ERROR", errres)
+                            occursin(r"ERROR", errres))
                 end
 
                 @testset "Message Limits" begin
