@@ -20,13 +20,15 @@ julia> @info "Hello World!"
 We can also pass our own destinations for Logging:
 
 ```julia
-julia> logger = IOLogger(Dict(Base.CoreLogging.Info => stderr, Base.CoreLogging.Error => devnull)) # default is stdout for everything above Info
+# default is stdout for everything above Info
+julia> logger = IOLogger(Dict(Base.CoreLogging.Info => stderr, Base.CoreLogging.Error => devnull))
 ```
 
 The same as above applies to `FileLogger()` as well, but instead of giving destination IO, we specify a destination file.
 
 ```julia
-julia> logger = FileLogger(Dict(Base.CoreLogging.Info => "info.log", Base.CoreLogging.Error => "error.log")) # default is default.log for everything above Info
+# default is default.log for everything above Info
+julia> logger = FileLogger(Dict(Base.CoreLogging.Info => "info.log", Base.CoreLogging.Error => "error.log"))
 ```
 
 For more information about the individual loggers, make sure to read `?IOLogger` and `?FileLogger`.
