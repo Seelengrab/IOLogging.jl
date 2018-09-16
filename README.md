@@ -1,5 +1,7 @@
 # IOLogging.jl
 
+[![Build Status](https://travis-ci.com/Seelengrab/IOLogging.jl.svg?branch=master)](https://travis-ci.com/Seelengrab/IOLogging.jl)
+
 A simple, thin package providing basic loggers for logging to IO. As the logging functionality from Base might change in the future, so will this package.
 
 ## Usage
