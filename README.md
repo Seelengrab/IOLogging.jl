@@ -7,7 +7,7 @@ A simple, thin package providing basic loggers for logging to IO. As the logging
 ## Usage
 
 ```julia
-julia> using Base.CoreLogging, IOLogging
+julia> using Logging, IOLogging
 
 julia> logger = IOLogger()
 
@@ -23,14 +23,14 @@ We can also pass our own destinations for Logging:
 
 ```julia
 # default is stdout for everything above Info
-julia> logger = IOLogger(Dict(Base.CoreLogging.Info => stderr, Base.CoreLogging.Error => devnull))
+julia> logger = IOLogger(Dict(Logging.Info => stderr, Logging.Error => devnull))
 ```
 
 The same as above applies to `FileLogger()` as well, but instead of giving destination IO, we specify a destination file.
 
 ```julia
 # default is default.log for everything above Info
-julia> logger = FileLogger(Dict(Base.CoreLogging.Info => "info.log", Base.CoreLogging.Error => "error.log"))
+julia> logger = FileLogger(Dict(Logging.Info => "info.log", Logging.Error => "error.log"))
 ```
 
 For more information about the individual loggers, make sure to read `?IOLogger` and `?FileLogger`.
