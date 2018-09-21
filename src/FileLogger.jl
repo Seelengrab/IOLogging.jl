@@ -11,8 +11,10 @@ struct FileLogger <: _iologger
     logPaths::Dict{LogLevel, AbstractString}
     logIOs::Dict{LogLevel, T} where T <: IO
     messageLimits::Dict{Any, Int}
+    flush::Bool
+    append::Bool
 
-    FileLogger(logPaths::Dict{LogLevel, String} = Dict(Info => "default.log")) = new(logPaths, Dict{LogLevel,IO}(), Dict{Any, Int}())
+    FileLogger(logPaths::Dict{LogLevel, String} = Dict(Info => "default.log"); flush = true, append = true) = new(logPaths, Dict{LogLevel,IO}(), Dict{Any, Int}(), flush, append)
 end
 
 CoreLogging.min_enabled_level(logger::FileLogger) = minimum(collect(keys(logger.logPaths)))
@@ -23,7 +25,7 @@ function getIO(logger::FileLogger, level::LogLevel)
         chosenLevel = sort(posFiles, by = x -> x[1], rev = true)[1][1]
         # Make sure the IO is open
         if !haskey(logger.logIOs, chosenLevel)
-            log = open(logger.logPaths[chosenLevel], "a")
+            log = open(logger.logPaths[chosenLevel], logger.append ? "a" : "w")
             finalizer(_ -> close(log), log) # close flushes
             logger.logIOs[chosenLevel] = log
         end
@@ -51,6 +53,6 @@ CoreLogging.handle_message(logger::FileLogger,
 
     io = getIO(logger, level)
     log!(io, level, string(message), _module, group, file, line; kwargs...)
-    flush(io)
+    logger.flush ? flush(io) : nothing
     nothing
 end

@@ -30,6 +30,16 @@ function keywordLogging()
     @warn "WARN" war
     @error "ERROR" err
 end
+
+function setupTestlog()
+    if isfile("appFlush.log")
+        rm("appFlush.log")
+    end
+    open("appFlush.log", "w") do file
+        println(file, "testlog")
+    end
+end
+
 @testset "IOLogging All Tests" begin
 @testset "IOLogger" begin
     @testset "Assertions" begin
@@ -51,17 +61,17 @@ end
         @testset "Multiline No Debug" begin
             with_logger(multiLineLogging, log)
             res = String(take!(buf))
-            @test (!occursin(r"(DEBUG)|(Debug)", res) &
-                    !occursin(r"debug_line_1\n", res) &
+            @test (!occursin(r"(DEBUG)|(Debug)", res) &&
+                    !occursin(r"debug_line_1\n", res) &&
                     !occursin(r"debug_line_2\n", res))
-            @test (occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                    occursin(r"info_line_1\n", res) &
+            @test (occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &&
+                    occursin(r"info_line_1\n", res) &&
                     occursin(r"info_line_2\n", res))
-            @test (occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                    occursin(r"warn_line_1\n", res) &
+            @test (occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &&
+                    occursin(r"warn_line_1\n", res) &&
                     occursin(r"warn_line_2\n", res))
-            @test (occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                    occursin(r"error_line_1\n", res) &
+            @test (occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &&
+                    occursin(r"error_line_1\n", res) &&
                     occursin(r"error_line_2\n", res))
         end
         @testset "Keyword Logging No Debug" begin
@@ -80,15 +90,15 @@ end
             with_logger(singleLineLogging, logger)
 
             infres = String(take!(infLog)) # should only contain messages from INFO and WARN
-            @test  (!occursin(r"DEBUG", infres) &
-                     occursin(r"INFO", infres) &
-                     occursin(r"WARN", infres) &
+            @test  (!occursin(r"DEBUG", infres) &&
+                     occursin(r"INFO", infres) &&
+                     occursin(r"WARN", infres) &&
                     !occursin(r"ERROR", infres))
 
             errres = String(take!(errLog)) # should only contain messages from ERROR
-            @test  (!occursin(r"DEBUG", errres) &
-                    !occursin(r"INFO", errres) &
-                    !occursin(r"WARN", errres) &
+            @test  (!occursin(r"DEBUG", errres) &&
+                    !occursin(r"INFO", errres) &&
+                    !occursin(r"WARN", errres) &&
                      occursin(r"ERROR", errres))
         end
         @testset "Message Limits" begin
@@ -107,7 +117,6 @@ end
     mktempdir(@__DIR__) do dir
         defaultLog = "default.log"
         cd(dir) do
-
             @testset "Assertions" begin
                 @test_nowarn FileLogger()
                 file = "assertions.log"
@@ -115,6 +124,43 @@ end
                 @test !isfile(file) # make sure the files don't exist until needed
                 # FIXME: @test if the file exists after logging
                 @test min_enabled_level(logger) === BelowMinLevel
+            end
+            @testset "Appending && Flushing" begin
+                @testset "Regular Use" begin
+                    log = FileLogger(Dict(Info => "appFlush.log"))
+                    setupTestlog()
+                    with_logger(log) do
+                        @info "infolog"
+                    end
+
+                    lines = readlines("appFlush.log", keep = true)
+                    @test lines[1] == "testlog\n"
+                    @test occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]* - infolog\n", lines[2])
+                end
+
+                @testset "No Flush" begin
+                    log = FileLogger(Dict(Info => "appFlush.log"), flush = false)
+                    setupTestlog()
+                    with_logger(log) do
+                        @info "infolog"
+                    end
+
+                    lines = readlines("appFlush.log", keep = true)
+                    @test length(lines) == 1
+                    @test lines[1] == "testlog\n"
+                end
+
+                @testset "No Append" begin
+                    log = FileLogger(Dict(Info => "appFlush.log"), append = false)
+                    setupTestlog()
+                    with_logger(log) do
+                        @info "infolog"
+                    end
+
+                    lines = readlines("appFlush.log", keep = true)
+                    @test length(lines) == 1
+                    @test occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]* - infolog\n", lines[1])
+                end
             end
             @testset "Logging" begin
                 log = FileLogger()
@@ -131,17 +177,17 @@ end
                     with_logger(multiLineLogging, log)
                     res = string(readlines(defaultLog, keep = true)...)
 
-                    @test (!occursin(r"(DEBUG)|(Debug)", res) &
-                           !occursin(r"debug_line_1\n", res) &
+                    @test (!occursin(r"(DEBUG)|(Debug)", res) &&
+                           !occursin(r"debug_line_1\n", res) &&
                            !occursin(r"debug_line_2\n", res))
-                    @test (occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                           occursin(r"info_line_1\n", res) &
+                    @test (occursin(r"\[Info::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &&
+                           occursin(r"info_line_1\n", res) &&
                            occursin(r"info_line_2\n", res))
-                    @test (occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                           occursin(r"warn_line_1\n", res) &
+                    @test (occursin(r"\[Warn::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &&
+                           occursin(r"warn_line_1\n", res) &&
                            occursin(r"warn_line_2\n", res))
-                    @test (occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &
-                           occursin(r"error_line_1\n", res) &
+                    @test (occursin(r"\[Error::[\d\-:T\.]*\][ a-zA-Z@\[\]\d\.\\\/:]*\n", res) &&
+                           occursin(r"error_line_1\n", res) &&
                            occursin(r"error_line_2\n", res))
                 end
                 @testset "Keyword Logging No Debug" begin
@@ -161,14 +207,14 @@ end
                     infres = string(readlines(infLog, keep = true)...)
                     errres = string(readlines(errLog, keep = true)...)
 
-                    @test  (!occursin(r"DEBUG", infres) &
-                            occursin(r"INFO", infres) &
-                            occursin(r"WARN", infres) &
+                    @test  (!occursin(r"DEBUG", infres) &&
+                            occursin(r"INFO", infres) &&
+                            occursin(r"WARN", infres) &&
                             !occursin(r"ERROR", infres))
 
-                    @test  (!occursin(r"DEBUG", errres) &
-                            !occursin(r"INFO", errres) &
-                            !occursin(r"WARN", errres) &
+                    @test  (!occursin(r"DEBUG", errres) &&
+                            !occursin(r"INFO", errres) &&
+                            !occursin(r"WARN", errres) &&
                             occursin(r"ERROR", errres))
                 end
 
