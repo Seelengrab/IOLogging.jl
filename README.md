@@ -4,6 +4,10 @@
 
 A simple, thin package providing basic loggers for logging to IO. As the logging functionality from Base might change in the future, so will this package.
 
+## Installation
+
+This package is registered with METADATA.jl, so you can just do `]add IOLogging` to install the package.
+
 ## Usage
 
 ```julia
