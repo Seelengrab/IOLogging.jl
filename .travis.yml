@@ -12,3 +12,6 @@ julia:
 matrix:
   allow_failures:
     - julia: nightly
+
+after-success:
+  - julia -e 'using Pkg; Pkg.add("Coverage"); using Coverage; Codecov.submit(Codecov.process_folder())'
