@@ -108,7 +108,7 @@ end
                 end
             end
             res = String(take!(buf))
-            @test_broken count(c -> c == '\n', res) == 10 # FIXME: wait for Base to fix logging ids
+            @test count(c -> c == '\n', res) == 10 
         end
     end
 end
@@ -225,7 +225,7 @@ end
                         end
                     end
                     res = string(readlines(defaultLog, keep = true)...)
-                    @test_broken count(c -> c == '\n', res) == 10 # FIXME: wait for Base to fix logging ids
+                    @test count(c -> c == '\n', res) == 10 
                 end
             end
         end
