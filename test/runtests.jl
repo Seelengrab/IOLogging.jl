@@ -108,7 +108,16 @@ end
                 end
             end
             res = String(take!(buf))
-            @test count(c -> c == '\n', res) == 10 
+            @test count(c -> c == '\n', res) == 10
+
+            # This is a different log position with the same message
+            with_logger(log) do
+                for _ in 1:20
+                    @info "message_Limit_test" maxlog=10
+                end
+            end
+            res = String(take!(buf))
+            @test count(c -> c == '\n', res) == 10
         end
     end
 end
@@ -225,7 +234,18 @@ end
                         end
                     end
                     res = string(readlines(defaultLog, keep = true)...)
-                    @test count(c -> c == '\n', res) == 10 
+                    matches = collect(eachmatch(r"message_Limit_test", res))
+                    @test length(matches) == 10
+
+                    # This is a different log position with the same message
+                    with_logger(log) do
+                        for _ in 1:20
+                            @info "message_Limit_test" maxlog=10
+                        end
+                    end
+                    res = string(readlines(defaultLog, keep = true)...)
+                    matches = collect(eachmatch(r"message_Limit_test", res))
+                    @test length(matches) == 20
                 end
             end
         end
