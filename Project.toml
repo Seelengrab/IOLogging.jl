@@ -1,7 +1,7 @@
 name = "IOLogging"
 uuid = "2f89813c-aa1d-11e8-3d93-2f1a3b18d50a"
 authors = ["Sukera <11753998+Seelengrab@users.noreply.github.com>"]
-version = "0.1.0"
+version = "0.2.0"
 
 [compat]
 julia = ">=0.7"
