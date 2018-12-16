@@ -12,3 +12,4 @@ julia:
 matrix:
   allow_failures:
     - julia: nightly
+    - os: windows
