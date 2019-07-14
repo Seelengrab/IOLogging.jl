@@ -4,7 +4,7 @@ using Base.CoreLogging
 using Base.CoreLogging: AbstractLogger, LogLevel, Debug, Info, Warn, Error, shouldlog, min_enabled_level, catch_exceptions, handle_message
 using Dates
 
-export IOLogger, FileLogger
+export IOLogger, FileLogger, MultifilesLogger
 
 """
 Abstract supertype of all loggers contained in this package.
@@ -109,5 +109,7 @@ function log!(io::T, level, message, _module, group, file, line; kwargs...) wher
 end
 
 include("FileLogger.jl")
+include("MultifilesLogger.jl")
+
 
 end # module
