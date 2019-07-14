@@ -83,6 +83,7 @@ CoreLogging.handle_message(logger::T,
 end
 
 function log!(io::T, level, message, _module, group, file, line; kwargs...) where { T <: IO }
+
     buffer = IOBuffer()
     context = IOContext(buffer, io)
     logTime = now()

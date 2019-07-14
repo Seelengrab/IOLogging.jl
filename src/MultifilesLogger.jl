@@ -65,24 +65,18 @@ function getIOLevelTuple(logger::MultifilesLogger,
         # This stop condition is because 'parentmodule(Main) == Main'
         while parentmodule(_module) != _module
             _module = parentmodule(_module)
-            println("Check if the module[$(_module)] has a logger")
-
-            for k in collect(keys(logger.logIOs))
-                println("Is $(_module) == $(k): $(_module == k)")
-            end
 
             # If the parent module has a logger we use it
             if haskey(logger.logIOs,_module)
-                println("Found one!")
                 break
             end
         end
 
         # Throw an exception if no logger could be found for the parents
         if !haskey(logger.logIOs,_module)
-            throw(DomainError("There is no logger defined for [$(string(original_module))]"
-                            * " and we were unable to find a logger in the parents modules,"
-                            * " not event a logger for the 'Main' module."))
+            throw(DomainError("There is no logger defined for module[$(string(original_module))]"
+                            * " and we were also unable to find a logger in the parents modules,"
+                            * " not even a logger for the 'Main' module."))
         end
 
     end

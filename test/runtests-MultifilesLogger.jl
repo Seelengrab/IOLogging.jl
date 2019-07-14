@@ -33,11 +33,7 @@ module MyModule2
     end
 end
 
-parentmodule(MyModule1.MySubModule1.MySubSubModule1)
-parentmodule(MyModule1)
-
-MyModule1.MySubModule1.sayhello()
-
+#
 # Prepare the configuration
 #
 logs_paths =  Dict("first.log" =>
@@ -46,11 +42,53 @@ logs_paths =  Dict("first.log" =>
                     "Main.log" => [(Main,Info)]
                     )
 
+# Create the logger and set it as the global logger
 multifilesLogger = MultifilesLogger(
     logs_paths;flush = true, append = true)
 
-
 global_logger(multifilesLogger)
 
+
+# First test with a module that is explicitely associated to a log file
 MyModule1.MySubModule1.sayhello()
+
+# Test the fallback mechanism when the module is not associated to a log file
+#  but one of its ancestors is.
 MyModule2.MySubModule1.sayhello()
+
+
+# Failed attempt to create some unit tests
+# mktempdir(@__DIR__) do dir
+#     cd(dir) do
+#         @testset "Assertions" begin
+#             logs_paths =  Dict("first.log" =>
+#                                     [(MyModule1.MySubModule1,Info),(MyModule1.MySubModule2,Info)],
+#                                 "second.log" => [(MyModule2,Info)],
+#                                 "Main.log" => [(Main,Info)]
+#                                 )
+#
+#             # Create the logger and set it as the global logger
+#             multifilesLogger = MultifilesLogger(
+#                 logs_paths;flush = true, append = false)
+#
+#             global_logger(multifilesLogger)
+#
+#             # Let the time to create the log files
+#             sleep(2)
+#
+#             # First test with a module that is explicitely associated to a log file
+#             MyModule1.MySubModule1.sayhello()
+#
+#             # Test the fallback mechanism when the module is not associated to a log file
+#             #  but one of its ancestors is.
+#             MyModule2.MySubModule1.sayhello()
+#
+#             # Let the time to go check the content of the log files
+#             sleep(15)
+#
+#             lines = readlines("first.log", keep = true)
+#             # println(lines[1])
+#             # @test occursin("MyModule1.MySubModule1 sayhello", lines[1])
+#         end
+#     end
+# end
