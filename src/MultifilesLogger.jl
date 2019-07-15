@@ -1,23 +1,32 @@
 """
 A multiple files logger for logging to files depending on the module.
-Flushes the necessary output stream after each write (i.e. after each logging event) by default and closes the files on finalizing. Opened files are by default appended to. Given `append = false`, they will be overwritten.
-NOTE: Every module must be explicitely declared
 
-    MultifilesLogger(
-        logs_paths =  Dict("first.log" =>
-                                [(MyModule1.MySubModule1, Info, true),(MyModule1.MySubModule2, Info, true)],
-                            "second.log" => [(MyModule2, Info, true)],
-                            "Main.log" => [(Main, Info, true)]
-                            );
-        flush = true, append = true)
+    fileDef1 = FileDefForMultifilesLogger("first.log",
+                                          true, # append
+                                          [(MyModule1.MySubModule1,Info),(MyModule1.MySubModule2,Info)],
+                                          )
 
-Logs logging events with LogLevel greater than or equal to `Info` to "default.log", should no `logPaths` be given. In case two LogLevels are present, e.g. `Info` and `Error`, all logging events from `Info` up to (but excluding) `Error` will be logged to the file given by `Info`. `Error` and above will be logged to the file given by `Error`. It is possible to "clamp" logging events, by providing an upper bound that's logging to `/dev/null` on Unix/Mac or `NUL` on Windows. Beware, as the message will still be composed before writing to the actual file (no hotwiring).
+    fileDef2 = FileDefForMultifilesLogger("second.log",
+                                            true, # append
+                                            [(MyModule2,Info)],
+                                            )
 
-By default, exceptions occuring during logging are not caught. This is expected to change in the future, once it's decided how exceptions during logging should be handled.
+    fileDef3 = FileDefForMultifilesLogger("main.log",
+                                            true, # append
+                                            [(Main,Info)],
+                                            )
+
+    # Create the logger and set it as the global logger
+    multifilesLogger =
+        MultifilesLogger([fileDef1,fileDef2,fileDef3])
+
+    global_logger(multifilesLogger)
+
+
 """
 
 struct FileDefForMultifilesLogger
-    
+
     filePath::String
     append::Bool
     modulesAndLogLevels::Vector{Tuple{Module,LogLevel}}
@@ -65,7 +74,7 @@ function createIOs!(logger::MultifilesLogger)
 
 end
 
-function getIOLevelTuple(logger::MultifilesLogger,
+function getIOLevelTuple!(logger::MultifilesLogger,
                          _module::Module,
                          Wlevel::LogLevel)
 
@@ -76,8 +85,12 @@ function getIOLevelTuple(logger::MultifilesLogger,
         while parentmodule(_module) != _module
             _module = parentmodule(_module)
 
-            # If the parent module has a logger we use it
+            # If the parent module has an IO we use it and we update the
+            #   logger.logIOs so that the unreferenced module now points to the
+            #   same IO as the parent module. This is done for performance
             if haskey(logger.logIOs,_module)
+                # println("Update logger.logIOs")
+                logger.logIOs[original_module] = logger.logIOs[_module]
                 break
             end
         end
@@ -113,7 +126,7 @@ CoreLogging.handle_message(logger::MultifilesLogger,
     end
 
 
-    io_level_tuple = getIOLevelTuple(logger, _module, level)
+    io_level_tuple = getIOLevelTuple!(logger, _module, level)
 
     io = io_level_tuple[1]
     loglevel_limit = io_level_tuple[2]
