@@ -5,9 +5,9 @@ NOTE: Every module must be explicitely declared
 
     MultifilesLogger(
         logs_paths =  Dict("first.log" =>
-                                [(MyModule1.MySubModule1,Info),(MyModule1.MySubModule2,Info)],
-                            "second.log" => [(MyModule2,Info)],
-                            "Main.log" => [(Main,Info)]
+                                [(MyModule1.MySubModule1, Info, true),(MyModule1.MySubModule2, Info, true)],
+                            "second.log" => [(MyModule2, Info, true)],
+                            "Main.log" => [(Main, Info, true)]
                             );
         flush = true, append = true)
 
@@ -15,21 +15,31 @@ Logs logging events with LogLevel greater than or equal to `Info` to "default.lo
 
 By default, exceptions occuring during logging are not caught. This is expected to change in the future, once it's decided how exceptions during logging should be handled.
 """
+
+struct FileDefForMultifilesLogger
+    
+    filePath::String
+    append::Bool
+    modulesAndLogLevels::Vector{Tuple{Module,LogLevel}}
+
+    # FileDefForMultifilesLogger(filePath::String,
+    #                             append::Bool,
+    #                            vectorsAndLogLevels::Vector{Tuple{Module,LogLevel}}) =
+
+end
+
 struct MultifilesLogger <: _iologger
-    logPaths::Dict{String, Vector{Tuple{Module,LogLevel}}}
+    filesDefs::Vector{FileDefForMultifilesLogger}
     logIOs::Dict{Module, Tuple{T,LogLevel}} where T <: IO
     messageLimits::Dict{Any, Int}
     flush::Bool
-    append::Bool
 
     MultifilesLogger(
-        logPaths::Dict{String, Vector{Tuple{Module,LogLevel}}};
-        flush = true,
-        append = true) = (x = new(logPaths,
-                             Dict{Module, Tuple{IO,LogLevel}}(),
+        filesDefs::Vector{FileDefForMultifilesLogger};
+        flush = true) = (x = new(filesDefs,
+                             Dict{Module, Tuple{IO, LogLevel}}(),
                              Dict{Any, Int}(),
-                             flush,
-                             append);
+                             flush);
                            createIOs!(x);
                            return x
                              )
@@ -40,15 +50,15 @@ CoreLogging.min_enabled_level(logger::MultifilesLogger) = Info
 
 function createIOs!(logger::MultifilesLogger)
 
-    append_arg = logger.append
-    logs_paths = logger.logPaths
+    for fileDef in logger.filesDefs
 
-    for (filepath,v) in logs_paths
-        # eg. (MyModule1.MySubModule1, Info)
-        for t in v
-            logger.logIOs[t[1]] =  (open(filepath,append_arg ? "a" : "w"),
-                                      t[2]
-                                      )
+        # Open one IO per Tuple{Module,LogLevel}
+        # NOTE: there can be several IOs pointing to the same file
+        for t in fileDef.modulesAndLogLevels
+            _module = t[1]
+            _loglevel = t[2]
+            logger.logIOs[_module] =  (open(fileDef.filePath, fileDef.append ? "a" : "w"),
+                                       _loglevel)
         end
 
     end

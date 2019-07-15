@@ -4,7 +4,7 @@ using Base.CoreLogging
 using Base.CoreLogging: AbstractLogger, LogLevel, Debug, Info, Warn, Error, shouldlog, min_enabled_level, catch_exceptions, handle_message
 using Dates
 
-export IOLogger, FileLogger, MultifilesLogger
+export IOLogger, FileLogger, MultifilesLogger, FileDefForMultifilesLogger
 
 """
 Abstract supertype of all loggers contained in this package.

@@ -34,17 +34,26 @@ module MyModule2
 end
 
 #
-# Prepare the configuration
+# Configure the log files
 #
-logs_paths =  Dict("first.log" =>
-                        [(MyModule1.MySubModule1,Info),(MyModule1.MySubModule2,Info)],
-                    "second.log" => [(MyModule2,Info)],
-                    "Main.log" => [(Main,Info)]
-                    )
+fileDef1 = FileDefForMultifilesLogger("first.log",
+                                      true, # append
+                                      [(MyModule1.MySubModule1,Info),(MyModule1.MySubModule2,Info)],
+                                      )
+
+fileDef2 = FileDefForMultifilesLogger("second.log",
+                                        true, # append
+                                        [(MyModule2,Info)],
+                                        )
+
+fileDef3 = FileDefForMultifilesLogger("main.log",
+                                        true, # append
+                                        [(Main,Info)],
+                                        )
 
 # Create the logger and set it as the global logger
-multifilesLogger = MultifilesLogger(
-    logs_paths;flush = true, append = true)
+multifilesLogger =
+    MultifilesLogger([fileDef1,fileDef2,fileDef3])
 
 global_logger(multifilesLogger)
 
@@ -61,15 +70,10 @@ MyModule2.MySubModule1.sayhello()
 # mktempdir(@__DIR__) do dir
 #     cd(dir) do
 #         @testset "Assertions" begin
-#             logs_paths =  Dict("first.log" =>
-#                                     [(MyModule1.MySubModule1,Info),(MyModule1.MySubModule2,Info)],
-#                                 "second.log" => [(MyModule2,Info)],
-#                                 "Main.log" => [(Main,Info)]
-#                                 )
-#
+#             #
 #             # Create the logger and set it as the global logger
-#             multifilesLogger = MultifilesLogger(
-#                 logs_paths;flush = true, append = false)
+#             multifilesLogger =
+#                 MultifilesLogger([fileDef1,fileDef2,fileDef3])
 #
 #             global_logger(multifilesLogger)
 #
