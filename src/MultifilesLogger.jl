@@ -1,3 +1,9 @@
+struct FileDefForMultifilesLogger
+    filePath::String
+    append::Bool
+    modulesAndLogLevels::Vector{Tuple{Module,LogLevel}}
+end
+
 """
 A multiple files logger for logging to files depending on the module.
 
@@ -41,13 +47,7 @@ struct MultifilesLogger <: _iologger
                              )
 end
 
-struct FileDefForMultifilesLogger
 
-    filePath::String
-    append::Bool
-    modulesAndLogLevels::Vector{Tuple{Module,LogLevel}}
-
-end
 
 # CoreLogging.min_enabled_level(logger::MultifilesLogger) = minimum(collect(keys(logger.logPaths)))
 CoreLogging.min_enabled_level(logger::MultifilesLogger) = Info

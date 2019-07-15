@@ -8,7 +8,6 @@ using Logging
 using Logging: Debug, Info, Warn, Error, BelowMinLevel, with_logger, min_enabled_level
 using Test
 
-
 # TODO make some real tests sets
 
 # Declare
