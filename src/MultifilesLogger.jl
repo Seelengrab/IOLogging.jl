@@ -24,19 +24,6 @@ A multiple files logger for logging to files depending on the module.
 
 
 """
-
-struct FileDefForMultifilesLogger
-
-    filePath::String
-    append::Bool
-    modulesAndLogLevels::Vector{Tuple{Module,LogLevel}}
-
-    # FileDefForMultifilesLogger(filePath::String,
-    #                             append::Bool,
-    #                            vectorsAndLogLevels::Vector{Tuple{Module,LogLevel}}) =
-
-end
-
 struct MultifilesLogger <: _iologger
     filesDefs::Vector{FileDefForMultifilesLogger}
     logIOs::Dict{Module, Tuple{T,LogLevel}} where T <: IO
@@ -52,6 +39,14 @@ struct MultifilesLogger <: _iologger
                            createIOs!(x);
                            return x
                              )
+end
+
+struct FileDefForMultifilesLogger
+
+    filePath::String
+    append::Bool
+    modulesAndLogLevels::Vector{Tuple{Module,LogLevel}}
+
 end
 
 # CoreLogging.min_enabled_level(logger::MultifilesLogger) = minimum(collect(keys(logger.logPaths)))
