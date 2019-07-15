@@ -65,6 +65,8 @@ MyModule1.MySubModule1.sayhello()
 #  but one of its ancestors is.
 MyModule2.MySubModule1.sayhello()
 
+# Test the logging for the 'Main' module
+@info "Should appear in main.log"
 
 # Failed attempt to create some unit tests
 # mktempdir(@__DIR__) do dir
