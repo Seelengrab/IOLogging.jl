@@ -1,8 +1,6 @@
 using Pkg
 Pkg.activate(".")
 
-using Revise
-
 using IOLogging
 using Logging
 using Logging: Debug, Info, Warn, Error, BelowMinLevel, with_logger, min_enabled_level
@@ -66,34 +64,3 @@ MyModule2.MySubModule1.sayhello()
 
 # Test the logging for the 'Main' module
 @info "Should appear in main.log"
-
-# Failed attempt to create some unit tests
-# mktempdir(@__DIR__) do dir
-#     cd(dir) do
-#         @testset "Assertions" begin
-#             #
-#             # Create the logger and set it as the global logger
-#             multifilesLogger =
-#                 MultifilesLogger([fileDef1,fileDef2,fileDef3])
-#
-#             global_logger(multifilesLogger)
-#
-#             # Let the time to create the log files
-#             sleep(2)
-#
-#             # First test with a module that is explicitely associated to a log file
-#             MyModule1.MySubModule1.sayhello()
-#
-#             # Test the fallback mechanism when the module is not associated to a log file
-#             #  but one of its ancestors is.
-#             MyModule2.MySubModule1.sayhello()
-#
-#             # Let the time to go check the content of the log files
-#             sleep(15)
-#
-#             lines = readlines("first.log", keep = true)
-#             # println(lines[1])
-#             # @test occursin("MyModule1.MySubModule1 sayhello", lines[1])
-#         end
-#     end
-# end
