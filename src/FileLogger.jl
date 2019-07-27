@@ -14,8 +14,7 @@ struct FileLogger <: _iologger
     flush::Bool
     append::Bool
 
-    FileLogger(logPaths::Dict{LogLevel, String} = Dict(Info => "default.log"); flush = true, append = true) =
-        new(logPaths, Dict{LogLevel,IO}(), Dict{Any, Int}(), flush, append)
+    FileLogger(logPaths::Dict{LogLevel, String} = Dict(Info => "default.log"); flush = true, append = true) = new(logPaths, Dict{LogLevel,IO}(), Dict{Any, Int}(), flush, append)
 end
 
 CoreLogging.min_enabled_level(logger::FileLogger) = minimum(collect(keys(logger.logPaths)))
