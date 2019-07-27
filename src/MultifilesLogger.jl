@@ -17,18 +17,16 @@ end
 A multiple files logger for logging to files depending on the module.
 
     fileDef1 = FileDefForMultifilesLogger("first.log",
-                                          true, # append
                                           [(MyModule1.MySubModule1,Info),(MyModule1.MySubModule2,Info)],
                                           )
 
     fileDef2 = FileDefForMultifilesLogger("second.log",
-                                            true, # append
                                             [(MyModule2,Info)],
                                             )
 
     fileDef3 = FileDefForMultifilesLogger("main.log",
-                                            true, # append
-                                            [(Main,Info)],
+                                           [(Main,Info)];
+                                           append = false 
                                             )
 
     # Create the logger and set it as the global logger
