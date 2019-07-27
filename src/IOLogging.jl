@@ -4,7 +4,7 @@ using Base.CoreLogging
 using Base.CoreLogging: AbstractLogger, LogLevel, Debug, Info, Warn, Error, shouldlog, min_enabled_level, catch_exceptions, handle_message
 using Dates
 
-export IOLogger, FileLogger
+export IOLogger, FileLogger, MultifilesLogger, FileDefForMultifilesLogger
 
 """
 Abstract supertype of all loggers contained in this package.
@@ -83,6 +83,7 @@ CoreLogging.handle_message(logger::T,
 end
 
 function log!(io::T, level, message, _module, group, file, line; kwargs...) where { T <: IO }
+
     buffer = IOBuffer()
     context = IOContext(buffer, io)
     logTime = now()
@@ -109,5 +110,7 @@ function log!(io::T, level, message, _module, group, file, line; kwargs...) wher
 end
 
 include("FileLogger.jl")
+include("MultifilesLogger.jl")
+
 
 end # module
